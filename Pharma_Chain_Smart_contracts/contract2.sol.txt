@@ -1,0 +1,180 @@
+pragma solidity ^0.4.0;
+contract pharma_chain_2
+{
+    struct requests
+    {
+        string p_id;
+        string mat_id;
+        string mat_name;
+        string supplyer_account;
+        string manfcture_account;
+        string amount;
+        string status;
+    }
+    
+    struct requests_2
+    {
+        string p_id;
+        string mat_id;
+        string mat_name;
+        string supplyer_account;
+        string manfcture_account;
+        uint tracking_id;
+        string mat_total_cost;
+    }
+    
+    
+    
+    struct authorization
+    {
+        string acc_1;
+        string acc_2;
+        string auth;
+    }
+    
+    mapping (uint => requests) public requests_struct;
+    mapping (uint => requests_2) public requests_struct_2;
+    mapping (uint => authorization) public authorization_struct;
+    
+    uint requests_struct_count;
+    uint authorization_struct_count;
+    
+    function add_auth(string _acc_1,string _acc_2,string _auth) public returns(uint)
+    {
+        authorization_struct_count++;
+        authorization_struct[authorization_struct_count] = authorization(_acc_1,_acc_2,_auth);
+        return 1;
+    }
+    
+    function check_auth(string _acc_1,string _acc_2) returns(string)
+    {
+        for(uint i = 1; i <= authorization_struct_count; i++)
+        {
+            authorization obj = authorization_struct[i];
+            if(stringsEqual(obj.acc_1,_acc_1) && stringsEqual(obj.acc_2,_acc_2))
+            {
+                return obj.auth;
+            }
+        }
+        
+        return "NULL";
+    }
+    
+    function change_auth(string _acc_1,string _acc_2,string _auth) returns(uint)
+    {
+        for(uint i = 1; i <= authorization_struct_count; i++)
+        {
+            authorization obj = authorization_struct[i];
+            if(stringsEqual(obj.acc_1,_acc_1) && stringsEqual(obj.acc_2,_acc_2))
+            {
+                obj.auth = _auth;
+            }
+        }
+        
+        return 1;
+    }
+    
+    
+    
+    function add_request(string _p_id ,string _mat_id,string _mat_name,string _supplyer_account,string _manfcture_account,string _amount,string _status,string _mat_total_cost) public returns (uint)
+    {
+        requests_struct_count++;
+        requests_struct[requests_struct_count] = requests(_p_id,_mat_id, _mat_name,_supplyer_account,_manfcture_account,_amount,_status);
+        requests_struct_2[requests_struct_count] = requests_2(_p_id,_mat_id, _mat_name,_supplyer_account,_manfcture_account,requests_struct_count,_mat_total_cost);
+
+        return requests_struct_count;
+    }
+    
+    function get_request_count() public returns(uint)
+    {
+        return requests_struct_count;
+    }
+    
+    
+    function get_requests_for_data(uint _index) public returns (string)
+    {
+        requests obj = requests_struct[_index];
+        requests_2 obj2 = requests_struct_2[_index];
+        
+        return string(abi.encodePacked(obj.mat_id,",",obj.mat_name,",",obj.manfcture_account,",",obj.supplyer_account,",",obj.amount,",",obj.status,",",uintToString(obj2.tracking_id),",",obj2.mat_total_cost));
+        
+      
+    }
+    
+    
+    
+    
+    function get_requests_for_supplyer(uint _index, string _account) public returns (string)
+    {
+        requests obj = requests_struct[_index];
+        requests_2 obj2 = requests_struct_2[_index];
+        if(stringsEqual(obj.supplyer_account,_account))
+        {
+            return string(abi.encodePacked(obj.mat_id,",",obj.mat_name,",",obj.manfcture_account,",",obj.amount,",",obj.status,",",uintToString(obj2.tracking_id),",",obj2.mat_total_cost));
+        }
+        return "NULL";
+    }
+    
+     function get_requests_for_man(uint _index,string _p_id, string _account) public returns (string)
+    {
+        requests obj = requests_struct[_index];
+        requests_2 obj2 = requests_struct_2[_index];
+        if(stringsEqual(obj.manfcture_account,_account) && stringsEqual(obj.p_id,_p_id))
+        {
+            return string(abi.encodePacked(obj.mat_id,",",obj.mat_name,",",obj.supplyer_account,",",obj.amount,",",obj.status,",",uintToString(obj2.tracking_id),",",obj2.mat_total_cost));
+        }
+        return "NULL";
+    }
+    
+    function request_status(string _mat_id,string _man_account,string _supplyer_account,string _status) public returns(uint)
+    {
+        for(uint i = 1; i < requests_struct_count; i++)
+        {
+            requests obj = requests_struct[i];
+            if(stringsEqual(obj.mat_id,_mat_id) && stringsEqual(obj.manfcture_account,_man_account) && stringsEqual(obj.supplyer_account,_supplyer_account))
+            {
+                obj.status = _status;
+                return 1;
+            }
+        }
+        
+        return 0;
+    }
+    
+    function request_status_change(uint _index,string _status)public returns (uint)
+    {
+       requests obj = requests_struct[_index];
+       obj.status = _status;
+       return 1;
+
+    }
+    
+    function uintToString(uint v) constant returns (string str) {
+        uint maxlength = 100;
+        bytes memory reversed = new bytes(maxlength);
+        uint i = 0;
+        while (v != 0) {
+            uint remainder = v % 10;
+            v = v / 10;
+            reversed[i++] = byte(48 + remainder);
+        }
+        bytes memory s = new bytes(i + 1);
+        for (uint j = 0; j <= i; j++) {
+            s[j] = reversed[i - j];
+        }
+        str = string(s);
+    }
+    
+    function stringsEqual(string storage _a, string memory _b) internal returns (bool) {
+		bytes storage a = bytes(_a);
+		bytes memory b = bytes(_b);
+		if (a.length != b.length)
+			return false;
+		// @todo unroll this loop
+		for (uint i = 0; i < a.length; i ++)
+			if (a[i] != b[i])
+				return false;
+		return true;
+	}
+
+}

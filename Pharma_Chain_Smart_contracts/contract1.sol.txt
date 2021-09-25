@@ -1,0 +1,304 @@
+pragma solidity ^0.4.0;
+contract pharma_chain_1
+{
+    struct bank
+    {
+        string name;
+        string account;
+        string amount;
+    }
+    
+    struct products
+    {
+        string manfcture_id;
+        string manfcture_name;
+        string product_id;
+        string product_name;
+        string product_farm;
+    }
+    
+    struct products_specs_manfcture
+    {
+        //string manfcture_id;
+        string product_id;
+        string material_name;
+        string material_type;
+        string material_strength;
+        string material_form;
+        string material_unit_cost;
+        string material_amount;
+    }
+    
+    struct products_standard_plan
+    {
+        string product_id;
+        string production_number;
+        string direct_labor_cost;
+    }
+    
+    struct supplyer_material_1
+    {
+        string suplyer_name;
+        string supplyer_account;
+        string material_id;
+        string material_name;
+        string material_form;
+        string material_strength;
+    }
+    
+    struct supplyer_material_2
+    {
+        string suplyer_name;
+        string supplyer_account;
+        string material_id;
+        string material_amount;
+        string material_stability_period;
+        string material_ins;
+    }
+    
+    struct supplyer_material_cost_plan
+    {
+        string material_id;
+        string supplyer_account;
+        string raw_material_cost;
+        string packaging_cost;
+        string labor_cost;
+        string shipping_cost;
+        string total_indirect;
+    }
+    
+    
+    
+    mapping (uint => bank) public bank_struct;
+    mapping (uint => products) public products_struct;
+    mapping (uint => products_specs_manfcture) public products_specs_manfcture_struct;
+    mapping (uint => products_standard_plan) public products_standard_plan_struct;
+    mapping (uint => supplyer_material_1) public supplyer_material_1_struct;
+    mapping (uint => supplyer_material_2) public supplyer_material_2_struct;
+    mapping (uint => supplyer_material_cost_plan) public supplyer_material_cost_plan_struct;
+    
+    uint bank_struct_count;
+    uint products_struct_count;
+    uint products_specs_manfcture_struct_count;
+    uint products_standard_plan_struct_count;
+    uint supplyer_material_1_struct_count;
+    uint supplyer_material_2_struct_count;
+    uint supplyer_material_cost_plan_struct_count;
+   
+    
+    
+   
+   
+   function get_data_products(uint _index) public returns (string)
+   {
+       products obj = products_struct[_index];
+       return string(abi.encodePacked(obj.manfcture_name,",",obj.product_name,",",obj.product_farm));
+   }
+   
+   function get_data_specs(uint _index) public returns (string)
+   {
+       products_specs_manfcture obj = products_specs_manfcture_struct[_index];
+       return string(abi.encodePacked(obj.product_id,",",obj.material_name,",",obj.material_type,",",obj.material_form,",",obj.material_amount));
+   }
+   
+   
+    
+    function add_material_cost_plan(string _material_id,string _supplyer_account,string _raw_material_cost,string _packaging_cost,string _labor_cost,string _shipping_cost,string _total_indirect  ) public returns(int)
+    {
+        supplyer_material_cost_plan_struct_count++;
+        supplyer_material_cost_plan_struct[supplyer_material_cost_plan_struct_count] = supplyer_material_cost_plan(_material_id,_supplyer_account, _raw_material_cost, _packaging_cost, _labor_cost, _shipping_cost, _total_indirect  );
+        return 1;
+    }
+    
+    function get_mateerial_cost_plan_count() public returns(uint)
+    {
+        return supplyer_material_cost_plan_struct_count;
+    }
+    
+    function get_supplyer_material_by_mat_id(uint _index ,string _mat_id) public returns(string)
+    {
+        
+        supplyer_material_1 obj1 = supplyer_material_1_struct[_index];
+        supplyer_material_2 obj2 = supplyer_material_2_struct[_index];
+        if(stringsEqual(obj1.material_id,_mat_id))
+        {
+            return string(abi.encodePacked(obj1.material_id,",", obj1.material_name,",",obj1.material_form,",",obj1.material_strength,",", obj2.material_amount,",", obj2.material_stability_period,",",obj2.material_ins,",",obj2.suplyer_name,",",obj2.supplyer_account));
+        }
+        return "NULL";
+    }
+    
+    function get_supplyer_material_cost_plan(string _mat_id, string _supplyer_account) public returns (string)
+    {
+        for (uint i = 1; i <= supplyer_material_cost_plan_struct_count;i++)
+        {
+            supplyer_material_cost_plan obj = supplyer_material_cost_plan_struct[i];
+            if(stringsEqual(obj.material_id,_mat_id) && stringsEqual(obj.supplyer_account,_supplyer_account))
+            {
+                 return string(abi.encodePacked(obj.raw_material_cost,",",obj.packaging_cost,",",obj.labor_cost,",",obj.shipping_cost,",",obj.total_indirect));
+            }
+        }
+        
+    }
+    
+    function get_supplyer_material_cost_plan_count()public returns(uint)
+    {
+        return supplyer_material_cost_plan_struct_count;
+    }
+    
+    function get_supplyer_material(uint _index ,string _account) public returns(string)
+    {
+        
+        supplyer_material_1 obj1 = supplyer_material_1_struct[_index];
+        supplyer_material_2 obj2 = supplyer_material_2_struct[_index];
+        if(stringsEqual(obj1.supplyer_account,_account))
+        {
+            return string(abi.encodePacked(obj1.material_id,",", obj1.material_name,",", obj2.material_amount));
+        }
+        return "NULL";
+    }
+    
+    function get_material_count() public returns(uint)
+    {
+        return supplyer_material_1_struct_count;
+    }
+    
+    function add_supplyer_material(string _supplyer_name,string _supplyer_account,string _material_id,string _material_name,string _material_form,string _material_strength,string _material_amount,string _material_stability_period, string _material_ins ) public returns(int)
+    {
+        supplyer_material_1_struct_count++;
+        supplyer_material_2_struct_count++;
+        supplyer_material_1_struct[supplyer_material_1_struct_count] = supplyer_material_1(_supplyer_name,_supplyer_account,_material_id,_material_name,_material_form,_material_strength);
+        supplyer_material_2_struct[supplyer_material_2_struct_count] = supplyer_material_2(_supplyer_name,_supplyer_account,_material_id,_material_amount,_material_stability_period,_material_ins);
+        return 1;
+    }
+    
+    
+    function add_to_products(string _manfcture_id,string _manfcture_name,string _product_id, string _product_name, string _product_farm) public returns (int)
+    {
+        products_struct_count++;
+        products_struct[products_struct_count] = products(_manfcture_id,_manfcture_name,_product_id,_product_name,_product_farm);
+        return 1;
+    }
+    
+    function get_products_count()public returns (uint)
+    {
+        return products_struct_count;
+    }
+    
+    function get_product_name(uint _index) returns (string)
+    {
+        products obj = products_struct[_index];
+        return obj.product_id;
+    }
+    
+    function add_to_product_specs(string _man_id,string _p_id,string _mat_name, string _mat_type , string _mat_strength , string _mat_form,string _mat_unit_cost , string _mat_amount) public returns (int)
+    {
+        products_specs_manfcture_struct_count++;
+      //  products_specs_manfcture_struct[products_specs_manfcture_struct_count] = products_specs_manfcture(_man_id,_p_id,_mat_name,_mat_type,_mat_strength,_mat_form,_mat_unit_cost,_mat_amount);
+        products_specs_manfcture_struct[products_specs_manfcture_struct_count] = products_specs_manfcture(_p_id,_mat_name,_mat_type,_mat_strength,_mat_form,_mat_unit_cost,_mat_amount);
+
+        return 1;
+    }
+    
+    function add_to_product_standard_plan(string _p_id,string _production_number,string _direct_labor) public returns(int)
+    {
+        products_standard_plan_struct_count++;
+        products_standard_plan_struct[products_standard_plan_struct_count] = products_standard_plan(_p_id,_production_number,_direct_labor);
+        return 1;
+    }
+    
+    function get_product_specs_count()public returns (uint)
+    {
+        return products_specs_manfcture_struct_count;
+    }
+    
+    
+    function get_specs(uint _index, string _p_id) public returns (string)
+    {
+       
+            products_specs_manfcture obj = products_specs_manfcture_struct[_index];
+            if(stringsEqual(obj.product_id,_p_id))
+            {
+                return string(abi.encodePacked(obj.material_name,",", obj.material_unit_cost,",", obj.material_amount));
+            }
+        
+        return "NULL";
+    }
+    
+    function get_std_plan( string _p_id) public returns (string)
+    {
+            for (uint i = 1; i <= products_standard_plan_struct_count;i++)
+            {
+                products_standard_plan obj = products_standard_plan_struct[i];
+                if(stringsEqual(obj.product_id,_p_id))
+                {
+                    return string(abi.encodePacked(obj.production_number,",", obj.direct_labor_cost));
+                }
+            }
+        return "NULL";
+    }
+    
+    
+    
+    function add_to_bank(string _name, string _account, string _amount) public returns(int)
+    {
+        bank_struct_count++;
+        bank_struct[bank_struct_count] = bank(_name,_account,_amount);
+        return 1;
+    }
+    
+    
+    function get_balance(string _name) public returns (string)
+    {
+        for (uint i = 1; i <= bank_struct_count;i++)
+        {
+            bank obj = bank_struct[i];
+            if(stringsEqual(obj.name,_name))
+            {
+                return (obj.amount);
+            }
+        }
+    }
+    
+    
+    function get_account(string _name) public returns (string)
+    {
+        for (uint i = 1; i <= bank_struct_count;i++)
+        {
+            bank obj = bank_struct[i];
+            if(stringsEqual(obj.name,_name))
+            {
+                return (obj.account);
+            }
+        }
+    }
+    
+    function account_deposite(string _name,string _amount) public returns (int)
+    {
+        for (uint i = 1; i <= bank_struct_count;i++)
+        {
+            bank obj = bank_struct[i];
+            if(stringsEqual(obj.name,_name))
+            {
+                obj.amount = _amount;
+                return 1;
+            }
+        }
+        return 0;
+    }
+    
+    
+    
+   
+    
+    function stringsEqual(string storage _a, string memory _b) internal returns (bool) {
+		bytes storage a = bytes(_a);
+		bytes memory b = bytes(_b);
+		if (a.length != b.length)
+			return false;
+		// @todo unroll this loop
+		for (uint i = 0; i < a.length; i ++)
+			if (a[i] != b[i])
+				return false;
+		return true;
+	}
+}
